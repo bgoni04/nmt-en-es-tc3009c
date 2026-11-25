@@ -1,0 +1,9 @@
+torch>=2.1
+transformers>=4.40
+sentencepiece>=0.1.99
+sacremoses
+sacrebleu>=2.3
+numpy
+pandas
+matplotlib
+tqdm

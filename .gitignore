@@ -1,0 +1,6 @@
+spa.txt
+spa-eng.zip
+_about.txt
+results/**/*.pt
+__pycache__/
+.ipynb_checkpoints/
