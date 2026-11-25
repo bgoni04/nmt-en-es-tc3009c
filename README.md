@@ -1,7 +1,7 @@
 # De Cero a Preentrenado: NMT Inglés → Español con 4 arquitecturas Seq2Seq
 
 Proyecto Final Integrador · **Procesamiento de Lenguaje Natural (TC3009C)** · Tecnológico de Monterrey
-Integrantes: _Nombre 1_ (A0XXXXXXX) · _Nombre 2_ (A0XXXXXXX)
+Integrantes: _Bruno Arturo Goñi FLores_ (A01769630) · _Nombre 2_ (A0XXXXXXX)
 
 | Modelo | Arquitectura | Entrenamiento |
 |---|---|---|
