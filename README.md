@@ -75,6 +75,16 @@ wget -q https://www.manythings.org/anki/spa-eng.zip && unzip -q -o spa-eng.zip
 jupyter lab notebooks/
 ```
 
+### Pruebas
+
+Con `spa.txt` en la raíz del repositorio:
+
+```bash
+python -m pytest
+```
+
+Verifican la partición y el Test Audit ID, la normalización, los vocabularios, `encode`/`decode` y los DataLoaders.
+
 ## Estructura
 
 ```
@@ -83,6 +93,8 @@ src/
   utils.py     semilla, dispositivo, conteo de parámetros, cronómetro, guardado de JSON
 notebooks/
   01_datos_y_auditoria.ipynb
+tests/
+  test_data.py pruebas de src/data.py y src/utils.py
 results/       métricas y figuras (los checkpoints .pt no se suben)
 ```
 

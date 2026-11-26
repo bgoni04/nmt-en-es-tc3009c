@@ -4,3 +4,4 @@ _about.txt
 results/**/*.pt
 __pycache__/
 .ipynb_checkpoints/
+.pytest_cache/
