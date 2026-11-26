@@ -1,0 +1,10 @@
+{
+  "train": 29130,
+  "val": 3641,
+  "test": 3642,
+  "test_audit_id": "dbac04ac5648",
+  "test_src_in_train": 564,
+  "vocab_en": 5529,
+  "vocab_es": 8026,
+  "min_freq": 2
+}

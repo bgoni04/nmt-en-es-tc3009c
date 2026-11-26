@@ -1,10 +1,4 @@
-"""
-Carga, partición reproducible, normalización y vocabularios.
-
-La función `load_and_split` replica EXACTAMENTE el bloque obligatorio de la
-Sección 3 del enunciado (filtro >= 8 palabras EN, <= 120 palabras, semilla 23,
-partición 80/10/10 y huella SHA-256 del test).
-"""
+"""Carga, partición 80/10/10, normalización, vocabularios y DataLoaders."""
 import hashlib
 import random
 import re
@@ -21,9 +15,6 @@ SPECIALS = [PAD, SOS, EOS, UNK]
 DATA_URL = "https://www.manythings.org/anki/spa-eng.zip"
 
 
-# ---------------------------------------------------------------------------
-# 1. Protocolo obligatorio (Listing 1 del enunciado)
-# ---------------------------------------------------------------------------
 def load_and_split(path="spa.txt", verbose=True):
     with open(path, "r", encoding="utf-8") as f:
         raw_pairs = [line.strip().split("\t")[:2] for line in f if "\t" in line]
@@ -53,9 +44,6 @@ def load_and_split(path="spa.txt", verbose=True):
     return train_pairs, val_pairs, test_pairs, test_hash
 
 
-# ---------------------------------------------------------------------------
-# 2. Normalización simétrica (se usa en entrenamiento desde cero Y en BLEU)
-# ---------------------------------------------------------------------------
 _APOS = re.compile(r"[’'`´]")
 _NON_ALNUM = re.compile(r"[^a-z0-9\s]")
 _SPACES = re.compile(r"\s+")
@@ -67,14 +55,10 @@ def strip_accents(s: str) -> str:
 
 
 def normalize(s: str) -> str:
-    """minúsculas -> sin acentos (ñ->n) -> sin puntuación -> espacios colapsados.
-
-    Esta MISMA función se aplica a: (a) entradas/salidas de los modelos A, B, C;
-    (b) predicciones de los 4 modelos y (c) referencias de test antes de BLEU.
-    """
+    """Minúsculas, sin acentos ni puntuación. Se usa igual en modelos y en BLEU."""
     s = strip_accents(s.lower())
-    s = _APOS.sub("", s)            # don't -> dont
-    s = _NON_ALNUM.sub(" ", s)      # ¿ ¡ . , ! ? etc. -> espacio
+    s = _APOS.sub("", s)
+    s = _NON_ALNUM.sub(" ", s)
     return _SPACES.sub(" ", s).strip()
 
 
@@ -83,12 +67,10 @@ def tokenize(s: str):
 
 
 def length_bucket(en_sentence: str) -> str:
-    """Bucket por longitud del ORIGEN en palabras (mismo criterio que el filtro)."""
     n = len(en_sentence.split())
-    return "medium" if n <= 18 else "long"   # el filtro garantiza n >= 8
+    return "medium" if n <= 18 else "long"
 
 
-# 3. Vocabularios 
 def build_vocab(sentences, min_freq=1, max_size=None):
     counter = Counter(tok for s in sentences for tok in tokenize(s))
     words = [w for w, c in counter.most_common(max_size) if c >= min_freq]
@@ -107,7 +89,7 @@ def build_vocabs(train_pairs, min_freq=1, max_size=None):
 
 
 def encode(sentence, word2idx, add_sos_eos=False, max_len=None):
-    ids = [word2idx.get(t, UNK_IDX) for t in tokenize(sentence)]   
+    ids = [word2idx.get(t, UNK_IDX) for t in tokenize(sentence)]
     if max_len is not None:
         ids = ids[:max_len]
     if add_sos_eos:
@@ -135,13 +117,11 @@ def oov_rate(pairs, eng_word2idx, spa_word2idx):
             "es_oov_%": rate([p[1] for p in pairs], spa_word2idx)}
 
 
-# 4. Dataset / DataLoader
 class TranslationDataset(Dataset):
     def __init__(self, pairs, eng_word2idx, spa_word2idx, max_len=None):
         self.data = [
             (encode(en, eng_word2idx, add_sos_eos=False, max_len=max_len) or [UNK_IDX],
-             encode(es, spa_word2idx, add_sos_eos=True,
-                    max_len=None if max_len is None else max_len))
+             encode(es, spa_word2idx, add_sos_eos=True, max_len=max_len))
             for en, es in pairs
         ]
 
